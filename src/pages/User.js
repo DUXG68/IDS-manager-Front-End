@@ -76,6 +76,7 @@ import UserServices from "../services/userService";
 
 
 function User() {
+    const token = sessionStorage.getItem('token');
     const notifySuccessVar = (success) => { toast.success(`${success}`) };
     const notifyErrorVar = (error) => toast.error(`ERROR: ${error} `);
 
@@ -98,12 +99,12 @@ function User() {
 
     const handleSubmitForm = (newUser, infoForm) => {
         if (!usernameRegex.test(newUser.user_name) || !nameRegex.test(newUser.name)) {
-            notifyErrorVar("Information is not correct format");
+            notifyErrorVar("Name only have a-z, A-Z, 0-9 and greater than 5 characters");
         }
         else if (infoForm === "Add User") {
             const getUserID = async () => {
                 try {
-                    const responseGetUserID = await UserServices.createUser(newUser)
+                    const responseGetUserID = await UserServices.createUser(newUser, token)
                     if (responseGetUserID.data.result.user_id) {
                         notifySuccessVar("Create User Success");
                         newUser = { ...newUser, user_id: responseGetUserID.data.result.user_id }
@@ -121,7 +122,7 @@ function User() {
                         })
                     } else { notifyErrorVar("Username already exist") }
                 } catch (error) {
-                    notifyErrorVar(`Lỗi khi gọi API add user`)
+                    notifyErrorVar('Token expired or wrong')
                 }
             };
             if (newUser.password !== newUser.re_password) {
@@ -134,6 +135,7 @@ function User() {
         } else if (infoForm === "Edit User") {
             const updateUser = async () => {
                 try {
+                    await UserServices.updateInfoUser(newUser.user_id, info, token)
                     notifySuccessVar("Update User Success");
                     var info = {
                         role: newUser.role,
@@ -148,7 +150,6 @@ function User() {
                         return user;
                     });
                     setUsers(updatedUsers);
-                    await UserServices.updateInfoUser(newUser.user_id, info)
                     setShowForm({ infoForm: "", show: false });
                     setContentForm({
                         user_id: '',
@@ -161,14 +162,14 @@ function User() {
                         re_password: ''
                     })
                 } catch (error) {
-                    notifyErrorVar(`Lỗi khi gọi API update user`)
+                    notifyErrorVar('Token expired or wrong')
                 }
             }
             updateUser();
         } else {
             const updatePass = async () => {
                 try {
-                    await UserServices.changePassUser(newUser.user_id, { password: newUser.password })
+                    await UserServices.changePassUser(newUser.user_id, { password: newUser.password }, token)
                     notifySuccessVar("Change Password Success");
                     setShowForm({ infoForm: "", show: false });
                     setContentForm({
@@ -182,6 +183,7 @@ function User() {
                         re_password: ''
                     })
                 } catch (error) {
+                    notifyErrorVar('Token expired or wrong')
                     console.error(`Lỗi khi gọi API update pass: ${error}`);
                 }
             }
@@ -210,19 +212,22 @@ function User() {
                             <button
                                 className="bg-red-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2"
                                 onClick={() => {
-                                    const filteredUsers = users.filter(user => user.user_id !== user_id);
-                                    setUsers(filteredUsers)
+
                                     const deleteUser = async (user_id) => {
                                         try {
-                                            const resdelete = await UserServices.deleteUser(user_id)
+                                            const resdelete = await UserServices.deleteUser(user_id, token)
+                                            const filteredUsers = users.filter(user => user.user_id !== user_id);
+                                            setUsers(filteredUsers)
+                                            notifySuccessVar("Delete User Success");
                                             console.log({ resdelete: resdelete })
                                         } catch (error) {
                                             console.error('Lỗi khi gọi API: delete rule', error);
+                                            notifyErrorVar('Token expired or wrong')
                                         }
                                     };
                                     deleteUser(user_id);
                                     onClose();
-                                    notifySuccessVar("Delete User Success");
+
                                 }}
                             >
                                 Yes
@@ -244,7 +249,7 @@ function User() {
         const updateState = async () => {
             try {
                 user_state = user_state === "Block" ? "Active" : "Block";
-                await UserServices.updateStateUser(user_id, { user_state: user_state })
+                await UserServices.updateStateUser(user_id, { user_state: user_state }, token)
                 const updatedRules = users.map(user => {
                     if (user.user_id === user_id) {
                         return { ...user, user_state: user_state, count_try: 0 };
@@ -253,6 +258,7 @@ function User() {
                 });
                 setUsers(updatedRules)
             } catch (error) {
+                notifyErrorVar('Token expired or wrong')
                 console.error('Lỗi khi gọi API:', error);
             }
         };
@@ -262,9 +268,10 @@ function User() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let responseAgent = await UserServices.getUsers()
+                let responseAgent = await UserServices.getUsers(token)
                 setUsers(responseAgent.data.result)
             } catch (error) {
+                notifyErrorVar('Token expired or wrong')
                 console.error('Lỗi khi gọi API:', error);
             }
         };

@@ -8,7 +8,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import { TokenContext } from '../globalState/tokenProvider'
 
 const UserProfile = () => {
-
+  const token = sessionStorage.getItem('token');
   const navigate = useNavigate();
   const notifySuccessVar = (success) => { toast.success(`${success}`) };
   const notifyErrorVar = (error) => toast.error(`ERROR: ${error} `);
@@ -30,17 +30,17 @@ const UserProfile = () => {
     const updateName = async () => {
       try {
         context.changeName(name)
-        await UserServices.updateInfo({ user_id: user_id, name: name })
+        await UserServices.updateInfo({ user_id: user_id, name: name }, token)
         notifySuccessVar("Update Success")
       } catch (error) {
-        setMessageName('Can not connect to server');
+        setMessageName('Can not connect to server or wrong token');
       }
     };
     if (nameRegex.test(name)) {
       updateName()
       setMessageName('');
     } else {
-      setMessageName('Name is not correct format');
+      setMessageName('Name only have a-z, A-Z, 0-9 and greater than 5 characters');
     }
   }
 
@@ -52,7 +52,7 @@ const UserProfile = () => {
     }
     const changePass = async () => {
       try {
-        const response = await UserServices.changPass({ user_id: user_id, password: currentPassword, password_new: newPassword })
+        const response = await UserServices.changPass({ user_id: user_id, password: currentPassword, password_new: newPassword }, token)
         console.log({ response: response })
         if (response.data.result === "update password success") {
           setMessagePass("")
@@ -68,11 +68,12 @@ const UserProfile = () => {
           setMessagePass("Password wrong")
         }
       } catch (error) {
-        setMessagePass('Can not connect to server');
+        setMessagePass('Can not connect to server or wrong token');
       }
     }
 
     if (passRegex.test(newPassword)) {
+
       changePass()
     } else {
       setMessagePass("Password must contain one digit from 1 to 9, one lowercase letter, one uppercase letter, one special character, no space, and it must be more than 8 characters long.")

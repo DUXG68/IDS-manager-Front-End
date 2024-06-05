@@ -13,7 +13,7 @@ import { FaSave } from "react-icons/fa";
 // import { useNavigate, useParams } from 'react-router-dom'
 const RulePage = () => {
     const navigation = useNavigate()
-    // const { indexAgent } = useParams()
+    const token = sessionStorage.getItem('token');
     const ipRegex = /^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))$/;
     const notifySuccessVar = (e) => { toast.success(e) };
     const notifyError = () => toast.error("Thông tin chưa đầy đủ hoặc chưa chính xác");
@@ -40,16 +40,17 @@ const RulePage = () => {
                 if (agents.length === 0) {
                     navigation("/rule/0")
                     // responseAgent = await AgentServices.getAgentsConnect()
-                    responseAgent = await AgentServices.getAgents()
+                    responseAgent = await AgentServices.getAgents(token)
                     setAgents(responseAgent.data.result)
-                    responseRule = await RuleServices.getRuleFromAgent(responseAgent.data.result[currentIndex].agent_id)
+                    responseRule = await RuleServices.getRuleFromAgent(responseAgent.data.result[currentIndex].agent_id, token)
                     setRules(responseRule.data.result)
                 } else {
-                    responseRule = await RuleServices.getRuleFromAgent(agents[currentIndex].agent_id)
+                    responseRule = await RuleServices.getRuleFromAgent(agents[currentIndex].agent_id, token)
                     setRules(responseRule.data.result)
                 }
             } catch (error) {
                 console.error('Lỗi khi gọi API:', error);
+                notifyErrorVar(`Token expired or wrong`)
             }
         };
         fetchData();
@@ -65,7 +66,7 @@ const RulePage = () => {
                 const getRuleID = async (newRule) => {
                     if (newRule.agent_ids.length !== 0) {
                         try {
-                            const responseGetRuleID = await RuleServices.createManyRule(newRule)
+                            const responseGetRuleID = await RuleServices.createManyRule(newRule, token)
                             if (responseGetRuleID.data.result.rule_id) {
                                 newRule = { ...newRule, rule_id: responseGetRuleID.data.result.rule_id }
                                 setRules([...rules, newRule]);
@@ -95,7 +96,8 @@ const RulePage = () => {
                                 notifyErrorVar(responseGetRuleID.data.result)
                             }
                         } catch (error) {
-                            notifyErrorVar(`Lỗi khi gọi API: add rule ${error}`);
+                            notifyErrorVar(`Token expired or wrong`)
+                            console.error(`Lỗi khi gọi API: add rule ${error}`);
                         }
                     } else {
                         notifyErrorVar("Please fill Agents")
@@ -113,7 +115,7 @@ const RulePage = () => {
                             return rule;
                         });
                         setRules(updatedRules);
-                        const responseUpdateRule = await RuleServices.updateRule(newRule)
+                        const responseUpdateRule = await RuleServices.updateRule(newRule, token)
                         notifySuccessVar("Edit Rule Success!");
                         setShowForm({ ...showForm, show: false });
                         setContentForm({
@@ -126,7 +128,7 @@ const RulePage = () => {
                             agent_ids: []
                         })
                     } catch (error) {
-                        notifyErrorVar(error)
+                        notifyErrorVar(`Token expired or wrong`)
                         console.error('Lỗi khi gọi API: edit rule', error);
                     }
                 };
@@ -147,19 +149,20 @@ const RulePage = () => {
                             <button
                                 className="bg-red-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2"
                                 onClick={() => {
-                                    const filteredRules = rules.filter(rule => rule.rule_id !== rule_id);
-                                    setRules(filteredRules)
-                                    console.log("Delete Rule")
                                     const deleteRule = async () => { //gọi api xóa phần từ có rule_id trong db
                                         try {
-                                            await RuleServices.deleteRule(rule_id)
+                                            await RuleServices.deleteRule(rule_id, token)
+                                            const filteredRules = rules.filter(rule => rule.rule_id !== rule_id);
+                                            setRules(filteredRules)
+                                            console.log("Delete Rule")
+                                            notifySuccessVar("Delete Rule Success!");
                                         } catch (error) {
                                             console.error('Lỗi khi gọi API: delete rule', error);
+                                            notifyErrorVar(`Token expired or wrong`)
                                         }
                                     };
                                     deleteRule();
                                     onClose();
-                                    notifySuccessVar("Delete Rule Success!");
                                 }}
                             >
                                 Yes
@@ -181,7 +184,7 @@ const RulePage = () => {
         const updateState = async () => {
             try {
                 rule_state = rule_state === "disable" ? "enable" : "disable";
-                await RuleServices.updateRuleState({ rule_id: rule_id, rule_state: rule_state })
+                await RuleServices.updateRuleState({ rule_id: rule_id, rule_state: rule_state }, token)
                 const updatedRules = rules.map(rule => {
                     if (rule.rule_id === rule_id) {
                         return { ...rule, rule_state };
@@ -189,10 +192,9 @@ const RulePage = () => {
                     return rule;
                 });
                 setRules(updatedRules)
-
-
             } catch (error) {
                 console.error('Lỗi khi gọi API:', error);
+                notifyErrorVar(`Token expired or wrong`)
             }
         };
         updateState();
@@ -211,7 +213,7 @@ const RulePage = () => {
         const saveRuleAgent = async () => {
             try {
                 const agentInfo = agents[currentIndex]
-                const res = await RuleServices.saveAgentRule(agentInfo)
+                const res = await RuleServices.saveAgentRule(agentInfo, token)
                 if (res.data.result === "success") {
                     notifySuccessVar("Save Success")
                 } else {
@@ -219,7 +221,7 @@ const RulePage = () => {
                 }
             } catch (error) {
                 console.error('Lỗi khi gọi API:', error);
-                notifyErrorVar(error)
+                notifyErrorVar(`Token expired or wrong`)
             }
         };
         saveRuleAgent();

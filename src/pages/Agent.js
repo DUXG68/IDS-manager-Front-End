@@ -9,6 +9,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 function Agent() {
+    const token = sessionStorage.getItem('token');
     const notifySuccessVar = (success) => { toast.success(`${success}`) };
     const notifyError = () => toast.error("Thông tin chưa đầy đủ hoặc chưa chính xác");
     const notifyErrorVar = (error) => toast.error(`ERROR: ${error} `);
@@ -32,7 +33,7 @@ function Agent() {
             if (infoForm === "Add Agent") {
                 const getAgentID = async (newAgent) => {
                     try {
-                        const responseGetAgentID = await AgentServices.createAgent(newAgent)
+                        const responseGetAgentID = await AgentServices.createAgent(newAgent, token)
                         if (responseGetAgentID.data.result.agent_id) {
                             notifySuccessVar("Create Agent Success!");
                             newAgent = { ...newAgent, agent_id: responseGetAgentID.data.result.agent_id }
@@ -47,7 +48,8 @@ function Agent() {
                             })
                         } else { notifyErrorVar('Agent information already exists') }
                     } catch (error) {
-                        notifyErrorVar(`Lỗi khi gọi API add agent:${error}`)
+                        notifyErrorVar(`Token expired or wrong`);
+                        console.error(`Lỗi khi gọi API add agent:${error}`);
                     }
                 };
                 getAgentID(newAgent)
@@ -55,14 +57,14 @@ function Agent() {
             } else {
                 const updateAgent = async (newAgent) => {
                     try {
-                        const updatedAgents = agents.map(agent => {
-                            if (agent.agent_id === newAgent.agent_id) {
-                                return { ...newAgent };
-                            }
-                            return agent;
-                        });
-                        const responseUpdateAgent = await AgentServices.updateAgent(newAgent)
+                        const responseUpdateAgent = await AgentServices.updateAgent(newAgent, token)
                         if (responseUpdateAgent.data.result === "Success") {
+                            const updatedAgents = agents.map(agent => {
+                                if (agent.agent_id === newAgent.agent_id) {
+                                    return { ...newAgent };
+                                }
+                                return agent;
+                            });
                             setAgents(updatedAgents);
                             notifySuccessVar("Edit Agent Success!");
                             setShowForm({ ...showForm, show: false });
@@ -77,7 +79,8 @@ function Agent() {
                             notifyErrorVar("Agent information already exists")
                         }
                     } catch (error) {
-                        notifyErrorVar(`Lỗi khi gọi API edit agent:${error}`);
+                        notifyErrorVar(`Token expired or wrong`)
+                        console.error(`Lỗi khi gọi API edit agent:${error}`);
                     }
                 };
                 updateAgent(newAgent);
@@ -96,19 +99,20 @@ function Agent() {
                             <button
                                 className="bg-red-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2"
                                 onClick={() => {
-                                    const filteredAgents = agents.filter(agent => agent.agent_id !== agent_id);
-                                    setAgents(filteredAgents)
                                     const deleteAgent = async (agent_id) => { //gọi api xóa phần từ có rule_id trong db
                                         try {
-                                            const resdelete = await AgentServices.deleteAgent(agent_id)
+                                            const resdelete = await AgentServices.deleteAgent(agent_id, token)
+                                            const filteredAgents = agents.filter(agent => agent.agent_id !== agent_id);
+                                            setAgents(filteredAgents)
+                                            notifySuccessVar("Delete Agent Success!");
                                             console.log({ resdelete: resdelete })
                                         } catch (error) {
-                                            notifyErrorVar(`Lỗi khi gọi API delete agent:${error}`)
+                                            notifyErrorVar(`Token expired or wrong`)
+                                            console.error(`Lỗi khi gọi API delete agent:${error}`)
                                         }
                                     };
                                     deleteAgent(agent_id);
                                     onClose();
-                                    notifySuccessVar("Delete Agent Success!");
                                 }}
                             >
                                 Yes
@@ -129,46 +133,46 @@ function Agent() {
     const handleCheckStatus = (agent) => {
         const checkAgentID = async (agent) => {
             try {
-                const responseCheckAgentID = await AgentServices.getStatusAgent(agent)
+                const responseCheckAgentID = await AgentServices.getStatusAgent(agent, token)
                 if (responseCheckAgentID.data.result === "success") {
                     const updateAgent = async (newAgent) => {
                         try {
-                            const updatedAgents = agents.map(agent => {
-                                if (agent.agent_id === newAgent.agent_id) {
-                                    return { ...newAgent, status: "Connected" };
-                                }
-                                return agent;
-                            });
-                            const responseUpdateAgent = await AgentServices.updateAgent({ ...newAgent, status: "Connected" })
+                            const responseUpdateAgent = await AgentServices.updateAgent({ ...newAgent, status: "Connected" }, token)
                             if (responseUpdateAgent.data.result === "Success") {
-                                notifySuccessVar("Connected Success");
+                                const updatedAgents = agents.map(agent => {
+                                    if (agent.agent_id === newAgent.agent_id) {
+                                        return { ...newAgent, status: "Connected" };
+                                    }
+                                    return agent;
+                                });
                                 setAgents(updatedAgents);
+                                notifySuccessVar("Connected Success");
                             } else {
                                 notifyErrorVar("Update Fail")
                             }
 
                         } catch (error) {
-                            notifyErrorVar(`Lỗi khi gọi API edit agent:${error}`)
+                            notifyErrorVar(`Token expired or wrong`)
                         }
                     };
                     updateAgent(agent);
                 } else {
                     const updateAgent = async (newAgent) => {
                         try {
-                            const updatedAgents = agents.map(agent => {
-                                if (agent.agent_id === newAgent.agent_id) {
-                                    return { ...newAgent, status: "Disconnected" };
-                                }
-                                return agent;
-                            });
-                            const responseUpdateAgent = await AgentServices.updateAgent({ ...newAgent, status: "Disconnected" })
+                            const responseUpdateAgent = await AgentServices.updateAgent({ ...newAgent, status: "Disconnected" }, token)
                             if (responseUpdateAgent.data.result === "Success") {
+                                const updatedAgents = agents.map(agent => {
+                                    if (agent.agent_id === newAgent.agent_id) {
+                                        return { ...newAgent, status: "Disconnected" };
+                                    }
+                                    return agent;
+                                });
                                 setAgents(updatedAgents);
                             } else {
                                 notifyErrorVar("Update Fail")
                             }
                         } catch (error) {
-                            notifyErrorVar(`Lỗi khi gọi API edit agent:${error}`)
+                            notifyErrorVar(`Token expired or wrong`)
                         }
                     };
                     if (agent.status === "Connected") {
@@ -178,7 +182,8 @@ function Agent() {
                 }
 
             } catch (error) {
-                notifyErrorVar(`Lỗi khi gọi API check agent:${error}`)
+                notifyErrorVar(`Token expired or wrong`);
+                console.error(`Lỗi khi gọi API check agent:${error}`)
             }
         };
 
@@ -190,10 +195,10 @@ function Agent() {
         const fetchData = async () => {
             try {
                 let responseAgent = []
-                responseAgent = await AgentServices.getAgents()
+                responseAgent = await AgentServices.getAgents(token)
                 setAgents(responseAgent.data.result)
             } catch (error) {
-                notifyErrorVar(`Lỗi khi gọi API :${error}`)
+                notifyErrorVar(`Token expired or wrong`)
             }
         };
         fetchData();

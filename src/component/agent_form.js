@@ -22,8 +22,18 @@ const AgentForm = ({ setContentForm, infoForm, contentForm, onSubmit, onCancel }
     };
 
     const copyApiKey = () => {
-        navigator.clipboard.writeText(contentForm.apikey);
-        alert('API Key copied to clipboard!');
+        // navigator.clipboard.writeText(contentForm.apikey);
+        // alert('API Key copied to clipboard!');
+        const unsecuredCopyToClipboard = (text) => { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy') } catch (err) { console.error('Unable to copy to clipboard', err) } document.body.removeChild(textArea) };
+        if (window.isSecureContext && navigator.clipboard) {
+            navigator.clipboard.writeText(contentForm.apikey);
+            alert('API Key copied to clipboard!');
+        } else {
+            unsecuredCopyToClipboard(contentForm.apikey);
+            alert('API Key copied to clipboard!');
+        }
+
+
     };
 
     const handleSubmit = (e) => {

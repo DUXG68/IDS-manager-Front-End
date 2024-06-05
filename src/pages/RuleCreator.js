@@ -62,8 +62,17 @@ function RuleCreator() {
     const [generatedRule, setGeneratedRule] = useState('');
 
     const copyRule = () => {
-        navigator.clipboard.writeText(generatedRule);
-        alert('Rule copied to clipboard!');
+        const unsecuredCopyToClipboard = (text) => { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy') } catch (err) { console.error('Unable to copy to clipboard', err) } document.body.removeChild(textArea) };
+        if (window.isSecureContext && navigator.clipboard) {
+            navigator.clipboard.writeText(generatedRule);
+            alert('Rule copied to clipboard!');
+        } else {
+            unsecuredCopyToClipboard(generatedRule);
+            alert('Rule copied to clipboard!');
+        }
+        // navigator.clipboard.writeText(generatedRule);
+        // alert('Rule copied to clipboard!');
+
     };
 
     const removeRegex = () => {

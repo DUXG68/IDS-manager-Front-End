@@ -1,49 +1,38 @@
 import Api from "./api";
 
-const RuleServices = {//ở UI sẽ dùng async await để gọi api
-
-    createNewCourse(teacherId, token) {
+const RuleServices = {
+    getRuleFromAgent(agent_id, token) {
         const headers = { Authorization: `Bearer ${token}` };
-        return Api().post(
-            `/course/create-course`,
-            { teacherId: teacherId },
-            {
-                headers,
-            }
-        );
+        return Api().get(`/rule/read_all/${agent_id}`, { headers });
     },
-    //cách truyền body và token
-    postFeedback(data, token) {
+    deleteRule(rule_id, token) {
         const headers = { Authorization: `Bearer ${token}` };
-        return Api().post("/api/Feedback/create", data, { headers });
+        return Api().delete(`/rule/delete/${rule_id}`, { headers });
     },
-    // ***************************************************************************
-    getRuleFromAgent(agent_id) {
-        return Api().get(`/rule/read_all/${agent_id}`);
+    createManyRule(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post("/rule/add_rule_many_agent", data, { headers })
     },
-    deleteRule(rule_id) {//xóa rule theo rule_id 
-        return Api().delete(`/rule/delete/${rule_id}`);
-    },
-    createRule(data) {//tạo rule và trả về rule_id
-        return Api().post("/rule/add_rule", data)
-    },
-    createManyRule(data) {//tạo rule và trả về rule_id
-        return Api().post("/rule/add_rule_many_agent", data)
-    },
-    createRuleManyAgent(data) {
-        return Api().post("/rule/add_rule_many_agent", data)
+    updateRule(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post("/rule/update", data, { headers })
     }
     ,
-    updateRule(data) {//tạo rule và trả về rule_id
-        return Api().post("/rule/update", data)
-    }
-    ,
-    updateRuleState(data) {//cập nhật state thay đổi
-        return Api().post("/rule/update_state", data)
+    updateRuleState(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post("/rule/update_state", data, { headers })
     },
-    saveAgentRule(data) {//chưa hoàn thành do cần thêm api của agent truyền hết thông tin của agent
-        return Api().post("/rule/save_agent", data)
+    saveAgentRule(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post("/rule/save_agent", data, { headers })
     }
+    // createRule(data) {
+    //     return Api().post("/rule/add_rule", data)
+    // },
+    // createRuleManyAgent(data) {
+    //     return Api().post("/rule/add_rule_many_agent", data)
+    // }
+    // ,
 
 
 };

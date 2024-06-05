@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { FaSearch } from "react-icons/fa";
 
 function Alert() {
+    const token = sessionStorage.getItem('token');
     const navigation = useNavigate();
     const [events, setEvents] = useState({
         total: 0,
@@ -35,7 +36,7 @@ function Alert() {
         const fetchData = async () => {
             try {
                 let responseAlert = []
-                responseAlert = await AlertServices.getAlerts(searchTerms, currentPage)
+                responseAlert = await AlertServices.getAlerts(searchTerms, currentPage, token)
                 if (responseAlert.data.result.total > 0) {
                     navigation(`/alert/${currentPage}`);
                     setEvents(
@@ -47,7 +48,7 @@ function Alert() {
                 } else {
                     navigation(`/alert/1`);
                     let responseAlertf = []
-                    responseAlertf = await AlertServices.getAlerts(searchTerms, 1)
+                    responseAlertf = await AlertServices.getAlerts(searchTerms, 1, token)
                     setEvents(
                         {
                             total: responseAlertf.data.result.total,
@@ -56,9 +57,9 @@ function Alert() {
                         })
                 }
             } catch (error) {
-                notifyErrorVar(`Lỗi khi gọi API :${error}`)
+                notifyErrorVar(`Token expired or wrong`)
+                console.log("err")
             }
-            console.log("interval")
         };
         fetchData();
         if (intervalId) {
@@ -67,11 +68,7 @@ function Alert() {
         } else {
             intervalId = setInterval(fetchData, 5000)
         }
-
-
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
-
-
         // intervalId = setInterval(fetchData, 5000); // Fetch every 5 seconds
     }, [search, currentPage])
 

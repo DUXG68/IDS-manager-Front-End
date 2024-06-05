@@ -34,13 +34,13 @@ const Navigation = () => {
                     <li>
                         <NavLink to="/alert/" activeclassname="active" className=" py-3 px-6 text-sm font-semibold  hover:bg-gray-700 flex items-center"><AiTwotoneAlert size='1.2rem' className="mr-1" /> Alert</NavLink>
                     </li>
+                    <li>
+                        <NavLink to="/ruleLab" activeclassname="active" className=" py-3 px-6 text-sm font-semibold   hover:bg-gray-700 flex items-center"><GiArchiveResearch size='1.2rem' className="mr-1" /> Rule Tool Kit</NavLink>
+                    </li>
                     {role === "admin" ?
                         <>
                             <li>
                                 <NavLink to="/rule" activeclassname="active" className=" py-3 px-6 text-sm font-semibold   hover:bg-gray-700 flex items-center"><MdRule size='1.2rem' className="mr-1" /> Rule</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/ruleLab" activeclassname="active" className=" py-3 px-6 text-sm font-semibold   hover:bg-gray-700 flex items-center"><GiArchiveResearch size='1.2rem' className="mr-1" /> Rule Tool Kit</NavLink>
                             </li>
                             <li>
                                 <NavLink to="/agent" activeclassname="active" className=" py-3 px-6 text-sm font-semibold   hover:bg-gray-700 flex items-center"><RiCustomerService2Fill size='1.2rem' className="mr-1" />Agent</NavLink>

@@ -1,14 +1,17 @@
 import Api from "./api";
 
 const AlertServices = {
-    getAlerts(data, currentPage) {
-        return Api().post(`/alert/get_all/${currentPage}`, data)
+    getAlerts(data, currentPage, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post(`/alert/get_all/${currentPage}`, data, { headers })
     },
-    getAlertsCount(data) {
-        return Api().post(`/alert/statis_time`, data)
+    getAlertsCount(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post(`/alert/statis_time`, data, { headers })
     },
-    getAlertsClass(data, currentPage) {
-        return Api().post(`/alert/statis_sid`, data)
+    getAlertsClass(data, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+        return Api().post(`/alert/statis_sid`, data, { headers })
     }
 
 }
