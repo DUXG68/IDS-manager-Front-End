@@ -169,14 +169,14 @@ function Dashboard() {
             format: 'hex'
         });
 
-        console.log(colors);
+        // console.log(colors);
         const fetchData = async () => {
             try {
                 if (currentIndex == 0) {
                     navigation("/dashboard/0")
                     let responseAlert = await AlertServices.getAlertsCount(timeSelect[currentIndex], token)
                     let responseClass = await AlertServices.getAlertsClass(timeSelect[currentIndex], token)
-                    console.log(responseClass.data.result)
+                    // console.log(responseClass.data.result)
                     if (typeof (responseAlert.data.result) != "string" || typeof (responseClass.data.result) != "string") {
                         setCountAlerts(responseAlert.data.result)
                         setClassAlerts(responseClass.data.result)
@@ -215,7 +215,7 @@ function Dashboard() {
     const handleChangeType = (e) => {
         e.preventDefault();
         const indexType = e.target.selectedIndex;
-        console.log({ indexType })
+        // console.log({ indexType })
         setCurrentIndex(indexType)
         navigation(`/dashboard/${indexType}`);
     };

@@ -592,7 +592,8 @@ function RuleCreator() {
 
                                     <input placeholder="ICMP Type" value={icmpType} onChange={(e) => { setIcmpType(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -615,7 +616,8 @@ function RuleCreator() {
 
                                     <input placeholder="ICMP Code" value={icmpCode} onChange={(e) => { setIcmpCode(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -643,7 +645,8 @@ function RuleCreator() {
 
                                     <input placeholder="TTL" value={ttl} onChange={(e) => { setTtl(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -665,7 +668,8 @@ function RuleCreator() {
 
                                     <input placeholder="IP Protocol" value={ipProtocol} onChange={(e) => { setIpProtocol(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -726,7 +730,8 @@ function RuleCreator() {
                                     <label className="block text-gray-700 mr-1">Offset:</label>
                                     <input placeholder="Offset" type="text" value={offset} onChange={(e) => { setOffset(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -739,7 +744,8 @@ function RuleCreator() {
                                     <label className="block text-gray-700 mr-1">Depth:</label>
                                     <input placeholder="Depth" type="text" value={depth} onChange={(e) => { setDepth(e.target.value); }} onBlur={(e) => {
                                         let value = e.target.value;
-                                        if (value.match(/^\d+$/g) === null) {
+                                        if (value == "") { }
+                                        else if (value.match(/^\d+$/g) === null) {
                                             e.target.classList.add('animate-shake');
                                             setTimeout(() => {
                                                 e.target.classList.remove('animate-shake');
@@ -796,6 +802,7 @@ function RuleCreator() {
                             <div className="flex justify-end">
                                 <button onClick={() => { removeContent(); setReset((prev) => (prev + 1)); }} className="bg-red-500 text-white px-4 py-2 rounded mr-2">Back</button>
                                 <button onClick={(e) => {
+
                                     if (!content.replace(/\s/g, '').length) {
                                         e.target.classList.add('animate-shake'); setTimeout(() => { e.target.classList.remove('animate-shake'); }, 500)
                                     } else { addContent({ contentFlag, contentHx, offset, depth }); setReset((prev) => (prev + 1)); }

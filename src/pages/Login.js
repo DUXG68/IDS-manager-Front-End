@@ -18,7 +18,7 @@ const Login = () => {
             try {
                 let responseUser = await UserServices.login({ user_name: username, password })
                 if (typeof (responseUser.data.result) == 'string') {
-                    notifyErrorVar(responseUser.data.result);
+                    notifyErrorVar("Username or Password wrong");
                 } else if (responseUser.data.result.name) {
                     context.loginSuccess(responseUser.data.result)
                     navigate("/dashboard");

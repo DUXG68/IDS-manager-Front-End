@@ -46,6 +46,7 @@ function App() {
           {role === "viewer" ?
             <Route path='/' element={<InApp />}>
               <Route path="dashboard/:type?" element={<Dashboard />} />
+              <Route path="ruleLab" element={<RuleCreator />} />
               <Route path="alert/:pageAlert?" element={<Alert />} />
               <Route path="profile" element={<UserProfile />} />
             </Route>

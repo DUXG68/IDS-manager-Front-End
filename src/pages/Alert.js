@@ -39,6 +39,7 @@ function Alert() {
                 responseAlert = await AlertServices.getAlerts(searchTerms, currentPage, token)
                 if (responseAlert.data.result.total > 0) {
                     navigation(`/alert/${currentPage}`);
+
                     setEvents(
                         {
                             total: responseAlert.data.result.total,
